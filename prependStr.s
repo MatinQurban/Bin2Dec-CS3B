@@ -13,7 +13,6 @@ prependStr:
 	LDRB W4, [X0]		// Save the first character, this is what we will prepend with
 // Create pointers
 	ADD X0, X0, X1		// Move str pointer to the end of current string
-	ADD X0, X0, #1		// Increment once more to include null
 	ADD X2, X0, X3		// Point to the 'end' of the result string, also including null
 
 shiftStrLoop: // This should only loop string length number of times
