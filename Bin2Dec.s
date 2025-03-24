@@ -34,6 +34,7 @@ Bin2DecConvert:
 
 	LDR X0, =szInput	// Load binary input
 	BL convert			// convert 16 bit binary number to decimal equivalent
+	B terminateB2D
 	CMP X1, #1			// if X1 = 1, set minus sign for negative number
 	B.NE decimalPositive// if not 1, then we do not need to output minus sign	
 	

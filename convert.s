@@ -28,6 +28,7 @@
 //	X4: Decimal number total
 //	X5: Positive or negative number
 //	X6: Integer storer
+//	X7: Return address
 
 //	Post:
 //	X0: Decimal equivalent number
@@ -36,24 +37,22 @@
 .global convert	// Program starting address
 
 convert:
-	.EQU SYS_exit, 93	// exit() supervisor call mode
 
 	.text	// Code here
-
+	MOV	X7, LR		// Save return address
 	MOV	X5, #0		// Store 0 into X5 as positive
 	LDRB	W2,[X0]		// Get leftmost bit of the binary string
 	CMP	W2, #'0'	// Find out if leftmost bit is 0 or 1
 	B.EQ	convert_pos	// If the leftmost bit is a 0, jump to the positive jump
 	MOV	X5, #1		// Else number is negative, so store state into X5
 
-	MOV	X8, X30		// Save return address
 	BL	complement	// Call 2s complement function
-	MOV	X30, X8		// Save return address
 
 convert_pos:
 
 	ADD	X0, X0, #1	// Increment current bit address by 1
 	MOV	X1, #16384	// Leftmost bit decimal equivalent into X1
+	MOV	X4, #0		// Reset counter
 
 convert_loop:
 
@@ -71,11 +70,12 @@ convert_loop:
 
 convert_end:
 
-	MOV	X0, X5		// Save decimal total result into X0
+	MOV	X0, X4		// Save decimal total result into X0
+	MOV	X1, X5		// Save pos or neg into X1
 
+	MOV	LR, X7		// Load return address
 	RET			// Return function
 
 	.data	// Data here
-
 
 .end	// End of program

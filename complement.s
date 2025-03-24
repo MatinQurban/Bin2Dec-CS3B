@@ -27,6 +27,8 @@
 //	X2: Carry
 //	X3: Counter
 //	X4: Saved original address
+//	X6: Return address
+
 
 //	Post:
 //	X0: Null terminated string containing 16 binary digits
@@ -39,6 +41,8 @@ complement:
 
 	.text	// Code here
 
+	MOV	X6, LR		// Save return address
+
 	MOV	X4, X0		// Save original address into X4
 	MOV	X3, #0		// Reset counter to 0
 
@@ -49,17 +53,17 @@ complement_firstloop:
 	CMP	W1, #'0'	// Find if bit is 0 or 1
 	B.EQ	complement_0	// Jump if current bit is 0
 
-	MOV	W1, #'0'
+	MOV	W1, #'0'	// If current bit is 1, store 0
 	BL	complement_firstcont	// Jump to continue
 
 complement_0:
 
-	MOV	W1, #'1'	// Store ascii 1 into W1
-	STRB	W1, [X0]	// Store it into current bit address
+	MOV	W1, #'1'	// If current bit is 0, store 1
 
 complement_firstcont:
 
-	ADD	X0, X0, X1	// Increment address
+	STRB	W1, [X0]	// Store current bit into current bit address
+	ADD	X0, X0, #1	// Increment address
 	CMP	X3, #16		// See if reached end of loop
 	B.NE	complement_firstloop	// Repeat loop if not yet at last bit
 
@@ -76,7 +80,7 @@ complement_firstcont:
 
 complement_firstbitone:
 
-	MOV	W1, '0'		// Update bit
+	MOV	W1, #'0'	// Update bit
 	MOV	X2, #1		// Save carry into X2
 
 complement_carryloop:
@@ -89,7 +93,7 @@ complement_carryloop:
 	MOV	W1, #'0'	// If bit is 1, update to 0
 	STRB	W1, [X0]	// Save bit
 	CMP	X0, X4		// Find out if at beginning of address
-	B.NE	complement_carryloop	// If not, then restart loop
+	B.GT	complement_carryloop	// If not, then restart loop
 	BL	complement_end	// If so, jump to end
 
 complement_carryzero:
@@ -100,6 +104,8 @@ complement_carryzero:
 complement_end:
 
 	MOV	X0, X4		// Save original address into X0
+
+	MOV	X30, X6		// Load return address
 	RET			// Return function
 
 	.data	// Data here
