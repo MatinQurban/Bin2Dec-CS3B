@@ -41,12 +41,18 @@ convert:
 	.text	// Code here
 	MOV	X7, LR		// Save return address
 	MOV	X5, #0		// Store 0 into X5 as positive
-	LDRB	W2,[X0]		// Get leftmost bit of the binary string
+	LDRB	W2, [X0]	// Get leftmost bit of the binary string
 	CMP	W2, #'0'	// Find out if leftmost bit is 0 or 1
 	B.EQ	convert_pos	// If the leftmost bit is a 0, jump to the positive jump
 	MOV	X5, #1		// Else number is negative, so store state into X5
 
 	BL	complement	// Call 2s complement function
+
+	LDRB	W2, [X0]	// Load in first bit
+	CMP	W2, #'1'	// Find out if first bit is still 1
+	B.NE	convert_pos	// Jump to convert_pos if not still 1
+	MOV	X1, #32768	// Move special case number into X1
+	BL	convert_end	// Jump to end
 
 convert_pos:
 
