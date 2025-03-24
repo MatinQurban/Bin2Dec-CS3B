@@ -21,7 +21,8 @@
 getBinput:
     .EQU SYS_exit, 93 // exit() supervisor call code
 	.text // code section
-	MOV X10, #0			// Set X10 (our error flag register) to 0
+	MOV X10, #0			// Set X10 (command flag register) to 0
+	MOV X11, #0			// Set X11 (warning flag) to 0 to reset
 	MOV X7, LR			// Store return address
 	MOV X4, #17			// taking 16 bit input, one more to include null character		
 	MOV X3, X0			// Save string buffer address, this will be manipulated
@@ -41,6 +42,9 @@ readStrLoop:
 	CMP W1, #'\n' // if it’s a new line character, that means we have reached the end of the input.
 	B.EQ readStrLoopEnd	// end loop and print
 
+// Check commands:
+	CMP X10, #0		// Check if command/error flag has been activated
+	B.NE readStrLoop// If not 0, that means a command has been detected, clear inbuffer
 // Check quit
 	CMP W1, #'q'	// if user entered 'q', quit program
 	B.EQ qFlag		// if 'q', jump to quit block
@@ -58,12 +62,14 @@ readStrLoop:
 	B.EQ LCVCheck	// if 0, continue reading and storing
 	B BinvalidInput	// if not 0, 1, c, or q, user has input an invalid character
 cFlag:
-	MOV X3, SP		// Reset X3 to original str ptr (stored in the stack)
+	//MOV X3, SP		// Reset X3 to original str ptr (stored in the stack)
+	MOV X10, #-3	// Move -3 into X10
 	MOV X5, #0		// char count to 0
 	B readStrLoop	// Since LCV reset, no need to check. Loop
 BinvalidInput:
-	MOV X10, #-2	// Set invalid input flag
-	MOV X5, #17		// Bloat length to stop storing
+	MOV X11, #1		// Set invalid input flag
+	SUB X5, X5, #1	// Decrement char count to ignore invalid input
+	B readStrLoop	// Do not store, continue reading
 LCVCheck:
 	CMP X5, X4	 	// compare the amount of chars read and the length of string array
 	B.GE readStrLoop	// if the length of the string has surpassed the end of our buffer stop adding to the buffer but continue reading to clear console
