@@ -29,41 +29,43 @@ getBinput:
 	SUB SP, SP, #16			// Allocate 64 bits/16 bytes on the stack to store X0
 	MOV SP, X0			// Save string buffer address, this will be used for resetting
 	MOV X5, #0			// This is our char count and lcv
-readStrLoop:	
+
 		// READ INPUT AND PLACE INSIDE BUFFER
 	MOV X0, #0		// file descriptor for SYS_READ INPUT (Keyboard)
-	LDR X1, =czBuffer	//	read() needs buffer pointer in X1
-	MOV X2, #1		// read() needs max read char count in X2
+	LDR X1, =szReadInBuffer	//	read() needs buffer pointer in X1
+	MOV X2, #63		// read() needs max read char count in X2
 	MOV X8, #63		// Linus call SYS_READ() system call number
 	SVC 0 			// call Linux to read the string	
+
+readStrLoop:
 	ADD X5, X5, #1	// increment lcv char count
-	LDR W1, [X1]	// Load value of char into W reg
+	LDRB W8, [X1], #1	// Load value of char into W reg, increment String buffer ptr
 		// CHECK LCV : 
-	CMP W1, #'\n' // if it’s a new line character, that means we have reached the end of the input.
+	CMP W8, #'\n' // if it’s a new line character, that means we have reached the end of the input.
 	B.EQ readStrLoopEnd	// end loop and print
 
 // Check commands:
 	CMP X10, #0		// Check if command/error flag has been activated
 	B.NE readStrLoop// If not 0, that means a command has been detected, clear inbuffer
 // Check quit
-	CMP W1, #'q'	// if user entered 'q', quit program
+	CMP W8, #'q'	// if user entered 'q', quit program
 	B.EQ qFlag		// if 'q', jump to quit block
-	CMP W1, #'Q'	// if user entered 'Q', quit program
+	CMP W8, #'Q'	// if user entered 'Q', quit program
 	B.EQ qFlag		// if 'Q', jump to quit block	
 // Check clear
-	CMP W1, #'c'	// if user entered 'c', clear previous input (reset str pointer)
+	CMP W8, #'c'	// if user entered 'c', clear previous input (reset str pointer)
 	B.EQ cFlag		// if 'c', jump to c flag area
-	CMP W1, #'C'	// if user entered 'C', same
+	CMP W8, #'C'	// if user entered 'C', same
 	B.EQ cFlag		// if 'C', jump to clear block
 // Validate input
-	CMP W1, #'1'	// if user entered 1 (valid), continue
+	CMP W8, #'1'	// if user entered 1 (valid), continue
 	B.EQ LCVCheck	// if 1, continue reading and storing
-	CMP W1, #'0'	// if user entered 0 (valid), continue
+	CMP W8, #'0'	// if user entered 0 (valid), continue
 	B.EQ LCVCheck	// if 0, continue reading and storing
 	B BinvalidInput	// if not 0, 1, c, or q, user has input an invalid character
 cFlag:
 	//MOV X3, SP		// Reset X3 to original str ptr (stored in the stack)
-	MOV X10, #-3	// Move -3 into X10
+	MOV X10, #-2	// Move -3 into X10
 	MOV X5, #0		// char count to 0
 	B readStrLoop	// Since LCV reset, no need to check. Loop
 BinvalidInput:
@@ -73,7 +75,7 @@ BinvalidInput:
 LCVCheck:
 	CMP X5, X4	 	// compare the amount of chars read and the length of string array
 	B.GE readStrLoop	// if the length of the string has surpassed the end of our buffer stop adding to the buffer but continue reading to clear console
-	STRB W1, [X3], #1	// Store char in string array, increment string pointer	
+	STRB W8, [X3], #1	// Store char in string array, increment string pointer	
 	B readStrLoop	// Loop to read next char
 qFlag:
 	MOV X10, #-1		// Load quit flag (-1) into X10
@@ -90,5 +92,5 @@ getBinputReturn:
 	MOV LR, X7		// Return address back to lr
     RET		// return to caller
 .data // data section
-	czBuffer:	.skip	16
+	szReadInBuffer:	.skip	64
 .end // end of program, optional but good pra

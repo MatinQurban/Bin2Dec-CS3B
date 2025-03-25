@@ -51,7 +51,7 @@ convert:
 	LDRB	W2, [X0]	// Load in first bit
 	CMP	W2, #'1'	// Find out if first bit is still 1
 	B.NE	convert_pos	// Jump to convert_pos if not still 1
-	MOV	X1, #32768	// Move special case number into X1
+	MOV	X4, #32768	// Move special case number into X1
 	BL	convert_end	// Jump to end
 
 convert_pos:

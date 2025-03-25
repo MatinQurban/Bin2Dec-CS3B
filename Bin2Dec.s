@@ -3,11 +3,30 @@
 
 _start:
 .EQU SYS_exit, 93 // exit() supervisor call code
+.MACRO printBorder border
+	BL putstring	// Print border
+	LDR X0, =szEOL	// Load address of EOL
+	BL putstring	// Print newline
+.ENDM
 .text // code section
-	LDR X0, =cmdList	// Load address of cmd list
-	BL putstring		// print user commands
+//Print menu
 	LDR X0, =szEOL		// load address of EOL
 	BL putstring		// print newline
+	LDR X0, =szBeautify	// Load address of top cmdlist border
+	BL putstring		// Print list border
+	LDR X0, =szBorderS	// Load address of side border
+	BL putstring		// Print list side border
+
+	LDR X0, =cmdList	// Load address of cmd list
+	BL putstring		// print user commands
+
+	LDR X0, =szBorderS	// Load address of side border
+	BL putstring		// Print list side border
+	LDR X0, =szBorderB	// Load address of bot border
+	BL putstring		// Print list bot border
+	LDR X0, =szEOL		// load address of EOL
+	BL putstring		// print newline
+
 B2DLoop:
 	LDR X0, =szOutput	// Load address of output str
 	MOV X1, #0			// Move 0 into register
@@ -23,10 +42,10 @@ B2DLoop:
 // Check if user input command
 	CMP X1, #-1			// if -1, quit program
 	B.EQ terminateB2D	// jump to quit block if input returned -1
-	CMP X11, #1			// if 1, output error message
-	B.EQ errorInputMsg	// jump to error block
 	CMP X1, #-2			// if -2, clear Input (reset str ptr)
-	B.EQ B2DLoop		// jump to reading again if input returned -3
+	B.EQ B2DLoop		// jump to reading again if input returned -2
+	CMP X11, #1			// if error flag active, output error message
+	B.EQ errorInputMsg	// jump to error block
 B2DContinue:
 // Extension Check
     LDR X0, =szInput	// Load adress of string input
@@ -75,12 +94,15 @@ terminateB2D:
     MOV X8, #SYS_exit // set exit() supervisor call code
     SVC 0 // call Linux to exit
 .data // data section
-	cmdList:		.asciz "\n\t'c' will clear\n\t'q' will exit\n"	// user commands
+	cmdList:		.asciz "\n0\t'c' will clear\t\t0\n0\t'q' will exit\t\t0\n"	// user commands
 	prompt:			.asciz "Enter a Binary Number : " // prompt message
 	szArrow:		.asciz " --> "	// arrow for conversion
 	szInput:		.skip 64	   // Binary value string input buffer
 	szOutput:		.skip 25		// Decimal equivalent of binary input
 	szEOL:          .asciz "\n"    // end of line string
 	szNeg:			.asciz "-"		// negative sign
-	inputError:		.asciz "Warning: Can only accept the following characters - <1> <0> <c> <q>. Will ignore invalid characters."	
+	inputError:		.asciz "Warning: Can only accept the following input - <1> <0> <c> <q>. Will ignore invalid characters."	
+	szBeautify:		.asciz "11111 - Bin2Dec Commands - 111111\n"
+	szBorderS:		.asciz "0\t\t\t\t0"
+	szBorderB:		.asciz "\n111111111111111111111111111111111\n"
 .end // end of program, optional but good pra
