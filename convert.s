@@ -4,17 +4,14 @@
 // Convert binary string to decimal int
 
 // Algorithm / Pseudocode:
-
 //	If bit 0 is 1:
 //		Store negative state
 //		Get 2s complement
-
-//	For bits 1 to 15:
+//	For bits 0 to 15:
 //		Multiply current bit by current bit place decimal value
 //		Add result to the total
 //		Divide bit place by 2
 //		Increment current bit address
-
 //	Return
 
 //	Pre:
@@ -28,18 +25,19 @@
 //	X4: Decimal number total
 //	X5: Positive or negative number
 //	X6: Integer storer
-//	X7: Return address
+//	X8: Return address
 
 //	Post:
 //	X0: Decimal equivalent number
 //	X1: 0 = Positive, 1 = Negative
 
-.global convert	// Program starting address
+.global convert	// Function starting address
 
 convert:
 
 	.text	// Code here
-	MOV	X7, LR		// Save return address
+
+	MOV	X8, LR		// Move return address into X8
 	MOV	X5, #0		// Store 0 into X5 as positive
 	LDRB	W2, [X0]	// Get leftmost bit of the binary string
 	CMP	W2, #'0'	// Find out if leftmost bit is 0 or 1
@@ -48,16 +46,9 @@ convert:
 
 	BL	complement	// Call 2s complement function
 
-	LDRB	W2, [X0]	// Load in first bit
-	CMP	W2, #'1'	// Find out if first bit is still 1
-	B.NE	convert_pos	// Jump to convert_pos if not still 1
-	MOV	X4, #32768	// Move special case number into X1
-	BL	convert_end	// Jump to end
-
 convert_pos:
 
-	ADD	X0, X0, #1	// Increment current bit address by 1
-	MOV	X1, #16384	// Leftmost bit decimal equivalent into X1
+	MOV	X1, #32768	// Leftmost bit decimal equivalent into X1
 	MOV	X4, #0		// Reset counter
 
 convert_loop:
@@ -72,16 +63,16 @@ convert_loop:
 	MOV	X6, #2		// Save Decimal 2 into X6
 	UDIV	X1, X1, X6	// Divide bit decimal equivalent by 2
 	ADD	X0, X0, #1	// Increment current bit address by 1
-	BL	convert_loop	// Restart loop
+	B	convert_loop	// Restart loop
 
 convert_end:
 
 	MOV	X0, X4		// Save decimal total result into X0
 	MOV	X1, X5		// Save pos or neg into X1
 
-	MOV	LR, X7		// Load return address
+	MOV	LR, X8		// Restore return address
 	RET			// Return function
 
 	.data	// Data here
 
-.end	// End of program
+.end	// End of function

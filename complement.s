@@ -3,18 +3,14 @@
 // 25 Mar 2025
 // 2s complement of binary number in string
 // Algorithm / Pseudocode:
-
 //	For bits 0 to 15:
 //		Flip bit
-
 //	For bit 15:
 //		Add binary 1 to bit
 //		Keep count of carry
-
 //	For bit 14 to 0 or when carry = 0:
 //		Update bit according to the carry
 //		Decrement current working bit
-
 //	Return
 
 //	Pre:
@@ -29,19 +25,16 @@
 //	X4: Saved original address
 //	X6: Return address
 
-
 //	Post:
 //	X0: Null terminated string containing 16 binary digits
 //	X5: Positive or negative number
 
-
-.global complement	// Program starting address
+.global complement	// Function starting address
 
 complement:
-
 	.text	// Code here
 
-	MOV	X6, LR		// Save return address
+//	Flip the bits
 
 	MOV	X4, X0		// Save original address into X4
 	MOV	X3, #0		// Reset counter to 0
@@ -54,7 +47,7 @@ complement_firstloop:
 	B.EQ	complement_0	// Jump if current bit is 0
 
 	MOV	W1, #'0'	// If current bit is 1, store 0
-	BL	complement_firstcont	// Jump to continue
+	B	complement_firstcont	// Jump to continue
 
 complement_0:
 
@@ -67,8 +60,7 @@ complement_firstcont:
 	CMP	X3, #16		// See if reached end of loop
 	B.NE	complement_firstloop	// Repeat loop if not yet at last bit
 
-
-
+//	Add 1
 
 	LDRB	W1, [X0]	// Get current bit
 	CMP	W1, #'0'	// Find if bit is 0 or 1
@@ -76,7 +68,7 @@ complement_firstcont:
 
 	MOV	W1, #'1'	// If current bit is 0, change to 1
 	STRB	W1, [X0]	// Store into current bit address
-	BL	complement_end	// Jump to end
+	B	complement_end	// Jump to end
 
 complement_firstbitone:
 
@@ -94,7 +86,7 @@ complement_carryloop:
 	STRB	W1, [X0]	// Save bit
 	CMP	X0, X4		// Find out if at beginning of address
 	B.GT	complement_carryloop	// If not, then restart loop
-	BL	complement_end	// If so, jump to end
+	B	complement_end	// If so, jump to end
 
 complement_carryzero:
 
@@ -104,11 +96,8 @@ complement_carryzero:
 complement_end:
 
 	MOV	X0, X4		// Save original address into X0
-
-	MOV	X30, X6		// Load return address
 	RET			// Return function
 
 	.data	// Data here
 
-
-.end	// End of program
+.end	// End of function
