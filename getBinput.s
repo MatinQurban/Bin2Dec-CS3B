@@ -30,6 +30,7 @@ getBinput:
 	MOV SP, X0			// Save string buffer address, this will be used for resetting
 	MOV X5, #0			// This is our char count and lcv
 
+takeBinput:
 		// READ INPUT AND PLACE INSIDE BUFFER
 	MOV X0, #0		// file descriptor for SYS_READ INPUT (Keyboard)
 	LDR X1, =szReadInBuffer	//	read() needs buffer pointer in X1
