@@ -8,6 +8,21 @@ _start:
 	LDR X0, =szEOL	// Load address of EOL
 	BL putstring	// Print newline
 .ENDM
+.MACRO waitForEnter
+	MOV X0, #0		 // file descriptor for SYS_READ INPUT (Keyboard)
+	LDR X1, =szInput // read() needs buffer pointer in X1
+	MOV X2, #63     // read() needs max read char count in X2
+	MOV X8, #63     // Linus call SYS_READ() system call number
+	SVC 0           // call Linux to read the string
+	
+searchTempStrQuit:
+	LDRB W2, [X1], #1   // Load value of char into W reg, increment String buffer ptr
+	CMP W2, #'q'		// Check if current byte is 'q'
+	B.EQ terminateB2D	// if 'q', terminate program
+	CMP W2, #'\n'		// Check for newline (end of input)
+	B.NE searchTempStrQuit	// If not end of input yet, continue reading
+.ENDM
+
 .text // code section
 //Print menu
 	LDR X0, =szEOL		// load address of EOL
@@ -81,6 +96,7 @@ decimalPositive:
 	LDR X0, =szEOL		// Load address of eol
 	BL putstring		// print newline
 	//B terminateB2D		// terminates program
+	waitForEnter		// Hold until the user hits enter to continue or q to quit
 	B B2DLoop			// Loop until user quits
 errorInputMsg:
 	LDR X0, =inputError	// load address of input error message
@@ -94,7 +110,7 @@ terminateB2D:
     MOV X8, #SYS_exit // set exit() supervisor call code
     SVC 0 // call Linux to exit
 .data // data section
-	cmdList:		.asciz "\n0\t'c' will clear\t\t0\n0\t'q' will exit\t\t0\n"	// user commands
+	cmdList:		.asciz "\n0\t'c' will clear\t\t0\n0\t'q' will exit\t\t0\n0\tEnter will continue\t0\n"	// user commands
 	prompt:			.asciz "Enter a Binary Number : " // prompt message
 	szArrow:		.asciz " --> "	// arrow for conversion
 	szInput:		.skip 64	   // Binary value string input buffer
