@@ -1,4 +1,19 @@
-// header from coding standard here, set tab to 4 spaces
+// Matin Qurbanzadeh
+// CS3B - Bin2Dec Group Project MAIN
+// Date Last Modified: 03/25/2025
+// The purpose of this program is to convert a binary string (up to 16 bits) into its signed decimal equivalent.
+// It prompts the user for a binary input, ensures it is properly formatted, extends it to 16 bits if necessary,
+// performs the conversion from two's complement binary to decimal, and then displays the result.
+//
+// Algorithm/Pseudocode:
+//    1. Display a command list with available options.
+//    2. Prompt the user for input (binary number, 'c' to clear, or 'q' to quit).
+//    3. Read and validate user input (ensuring only '0's and '1's are considered).
+//    4. If input is shorter than 16 bits, perform sign extension to 16 bits.
+//    5. Convert the two’s complement binary value into its signed decimal equivalent.
+//    6. Display the binary input, an arrow (-->), and the resulting decimal value.
+//    7. Repeat the process until the user chooses to quit.
+
 .global _start // Provide program starting address
 
 _start:

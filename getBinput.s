@@ -1,3 +1,19 @@
+// Matin Qurbanzadeh
+// CS3B - Group Bin2Dec - getBinput
+// Date Last Modified: 03/25/2025
+// Purpose: Reads a string of binary input (0s and 1s) from the user, processes input 
+// commands ('c' to clear, 'q' to quit), and ensures a 16-bit formatted output.
+// Algorithm/Pseudocode:
+//    1. Initialize registers and stack memory for input handling.
+//    2. Read user input (up to 64 bytes) using a system call and store it in a temporary buffer.
+//    3. Loop through each character in the buffer:
+//       a. If '0' or '1', store it in the return array.
+//       b. If 'c', reset input processing and prompt user for a new input line.
+//       c. If 'q', set the quit flag and continue clearing the buffer.
+//       d. If invalid, raise a warning and ignore the character.
+//       e. If newline is reached, finalize input processing.
+//    4. Return the processed binary string and command flag.
+
 //*****************************************************************************
 //getB2Dinput
 //  Function getB2Dinput modifies getstring: Will read a string of characters 

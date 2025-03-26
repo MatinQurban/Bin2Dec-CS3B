@@ -1,3 +1,17 @@
+// Matin Qurbanzadeh
+// CS3B - Bin2Dec Group Project - Sign Extension (prependStr.s)
+// Date Last Modified: 03/25/2025
+// The purpose of this function is to prepend a given string with its first character until it reaches a desired length.  
+// The function ensures proper alignment by shifting the existing characters before prepending 
+//  
+// Algorithm/Pseudocode:  
+//    1. Compute the difference (D) between the desired length (16) and the current string length (L).  
+//    2. Store the first character of the string as the prepend character.  
+//    3. Create pointers for both the original string and the larger destination space.  
+//    4. Shift the existing characters towards the end of the new string buffer to make space.  
+//    5. Prepend the retained first character D times until the desired length is met.  
+//    6. Return to the caller for further processing.  
+
 // X0: ptr: string buffer
 // X1: string length
 // X2: Desired length
